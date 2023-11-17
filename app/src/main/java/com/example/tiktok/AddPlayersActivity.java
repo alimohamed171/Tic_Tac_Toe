@@ -2,6 +2,8 @@ package com.example.tiktok;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -18,6 +20,7 @@ public class AddPlayersActivity extends AppCompatActivity {
         binding = ActivityAddPlayersBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        showAlertDialog("just add your name in X if you want play alone it's optional");
 
         binding.startGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,4 +58,25 @@ public class AddPlayersActivity extends AppCompatActivity {
         });
 
     }
+
+
+    private void showAlertDialog(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+
+        builder.setTitle("")
+                .setMessage(message)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        dialog.dismiss();
+                    }
+                });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+
 }
