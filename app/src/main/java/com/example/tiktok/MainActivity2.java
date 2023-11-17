@@ -2,30 +2,33 @@ package com.example.tiktok;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.example.tiktok.databinding.ActivityMainBinding;
+import com.example.tiktok.databinding.ActivityMain2Binding;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity2 extends AppCompatActivity {
 
 
+    private ImageView[] imageViews = new ImageView[9];
     private final List<int[]> combinationList = new ArrayList<>();
-
     private int[] boxPositions = {0,0,0,0,0,0,0,0,0}; //9 zero
     private int playerTurn = 1;
     private int totalSelectedBoxes = 1;
+    ActivityMain2Binding binding ;
 
-    ActivityMainBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        binding = ActivityMain2Binding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         combinationList.add(new int[] {0,1,2});
@@ -38,11 +41,20 @@ public class MainActivity extends AppCompatActivity {
         combinationList.add(new int[] {0,4,8});
 
 
-        String getPlayerOneName = getIntent().getStringExtra("playerOne");
-        String getPlayerTwoName = getIntent().getStringExtra("playerTwo");
 
+        imageViews[0] = binding.image1;
+        imageViews[1] = binding.image2;
+        imageViews[2] = binding.image3;
+        imageViews[3] = binding.image4;
+        imageViews[4] = binding.image5;
+        imageViews[5] = binding.image6;
+        imageViews[6] = binding.image7;
+        imageViews[7] = binding.image8;
+        imageViews[8] = binding.image9;
+
+        String getPlayerOneName = getIntent().getStringExtra("playerOne");
         binding.playerOneName.setText(getPlayerOneName);
-        binding.playerTwoName.setText(getPlayerTwoName);
+        binding.playerTwoName.setText("AI");
 
 
         binding.image1.setOnClickListener(new View.OnClickListener() {
@@ -50,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (isBoxSelectable(0)){
                     performAction((ImageView) view, 0);
+
                 }
             }
         });
@@ -122,47 +135,49 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
-
-
-
-
-
-
     private void performAction(ImageView  imageView, int selectedBoxPosition) {
         boxPositions[selectedBoxPosition] = playerTurn;
 //          player one X
         if (playerTurn == 1) {
             imageView.setImageResource(R.drawable.ximage);
             if (checkResults()) {
-                ResultDialogActivity resultDialog = new ResultDialogActivity(MainActivity.this,binding.playerOneName.getText().toString()
-                        + " is a Winner!", MainActivity.this);
-                resultDialog.setCancelable(false);
-                resultDialog.show();
+                showAlertDialog(binding.playerOneName.getText().toString()
+                        + " is a Winner!");
+
             } else if(totalSelectedBoxes == 9) {
-                ResultDialogActivity resultDialog = new ResultDialogActivity(MainActivity.this,"Match Draw", MainActivity.this);
-                resultDialog.setCancelable(false);
-                resultDialog.show();
+                showAlertDialog( "Match Draw");
+
             } else {
                 changePlayerTurn(2);
                 totalSelectedBoxes++;
+
+
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        int aiMove = TicTacToeAI.findBestMove(boxPositions);
+                        performAction(getImageViewForIndex(aiMove), aiMove);
+                    }
+                }, 1000);
+
             }
-        //  player O
+            //  player O
         } else {
             imageView.setImageResource(R.drawable.oimage);
             if (checkResults()) {
-                ResultDialogActivity resultDialog = new ResultDialogActivity(MainActivity.this,binding.playerTwoName.getText().toString()
-                        + " is a Winner!", MainActivity.this);
-                resultDialog.setCancelable(false);
-                resultDialog.show();
+                showAlertDialog(binding.playerTwoName.getText().toString()
+                        + " is a Winner!");
+
+
             } else if(totalSelectedBoxes == 9) {
-                ResultDialogActivity resultDialog = new ResultDialogActivity(MainActivity.this,"Match Draw", MainActivity.this);
-                resultDialog.setCancelable(false);
-                resultDialog.show();
+                showAlertDialog( "Match Draw");
+
             } else {
                 changePlayerTurn(1);
                 totalSelectedBoxes++;
+
             }
         }
     }
@@ -192,14 +207,6 @@ public class MainActivity extends AppCompatActivity {
         return response;
     }
 
-    private boolean isBoxSelectable(int boxPosition) {
-        boolean response = false;
-        if (boxPositions[boxPosition] == 0) {
-            response = true;
-        }
-        return response;
-    }
-
     public void restartMatch(){
         boxPositions = new int[] {0,0,0,0,0,0,0,0,0}; //9 zero
         playerTurn = 1;
@@ -214,4 +221,49 @@ public class MainActivity extends AppCompatActivity {
         binding.image8.setImageResource(R.drawable.white_box);
         binding.image9.setImageResource(R.drawable.white_box);
     }
+
+    private boolean isBoxSelectable(int boxPosition) {
+        boolean response = false;
+        if (boxPositions[boxPosition] == 0) {
+            response = true;
+        }
+        return response;
+    }
+
+
+
+    private void showAlertDialog(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("")
+                .setMessage(message)
+                .setPositiveButton("Restart Match", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        restartMatch();
+                        dialog.dismiss();
+                    }
+                });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+
+
+
+
+    private ImageView getImageViewForIndex(int index) {
+        // Check if the index is within bounds
+        if (index >= 0 && index < imageViews.length) {
+            return imageViews[index];
+        } else {
+            // Handle the case where the index is out of bounds
+            // You may return null or handle it based on your requirements
+            return null;
+        }
+    }
+
+
+
 }

@@ -36,6 +36,23 @@ public class AddPlayersActivity extends AppCompatActivity {
                 }
             }
         });
+        binding.startGameAI.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+               String getPlayerOneName = binding.playerOne.getText().toString();
+               if (getPlayerOneName.isEmpty() ) {
+                   getPlayerOneName = "Player 1";
+                   Intent intent = new Intent(AddPlayersActivity.this, MainActivity2.class);
+                   intent.putExtra("playerOne", getPlayerOneName);
+                   startActivity(intent);
+               } else {
+                   Intent intent = new Intent(AddPlayersActivity.this, MainActivity2.class);
+                   intent.putExtra("playerOne", getPlayerOneName);
+                   startActivity(intent);
+               }
+           }
+
+        });
 
     }
 }

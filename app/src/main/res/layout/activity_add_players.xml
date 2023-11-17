@@ -70,6 +70,17 @@
                 android:textSize="18sp"
                 app:cornerRadius = "20dp"/>
 
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="20dp"
+                android:id="@+id/startGameAI"
+                android:text="Start AI Game"
+                android:textSize="18sp"
+                app:cornerRadius = "20dp"/>
+
+
+
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
